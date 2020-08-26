@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { randomWord, ENGLISH_WORDS } from "./words.js";
 
 import "./Snowman.css";
 import img0 from "./0.png";
@@ -26,14 +27,24 @@ import img6 from "./6.png";
 function Snowman(props) {
   /** by default, allow 6 guesses and use provided gallows images. */
 
+  const word = [randomWord(ENGLISH_WORDS)]
+
   const [nWrong, setNWrong] = useState(0);
   const [guessed, setGuessed] = useState(new Set());
-  const [answer, setAnswer] = useState((props.words)[0]);
+  const [answer, setAnswer] = useState(word[0]);
+
+  /** Reset all state variables and randomly select a new word to play with */
+  function selectNewWord() {
+    setAnswer([randomWord(ENGLISH_WORDS)][0]);
+    setGuessed(new Set());
+    setNWrong(0);
+  }
 
   /** guessedWord: show current-state of word:
    if guessed letters are {a,p,e}, show "app_e" for "apple"
    */
   function guessedWord() {
+    // debugger
     return answer
         .split("")
         .map(ltr => (guessed.has(ltr) ? ltr : "_"));
@@ -70,11 +81,17 @@ function Snowman(props) {
   }
 
   /** render: render game */
+  //TODO: hide generateButtons when nWrong >= maxWrong
   return (
       <div className="Snowman">
         <img src={(props.images)[nWrong]} alt={nWrong} />
+        <p>Number wrong: {nWrong}</p>
         <p className="Snowman-word">{guessedWord()}</p>
-        <p>{generateButtons()}</p>
+        {(nWrong < props.maxWrong) &&
+        <p>{generateButtons()}</p>}
+        {!(nWrong < props.maxWrong) &&
+        <p>You lose!</p>}
+        <button onClick={selectNewWord}>Restart</button>
       </div>
   );
 }
